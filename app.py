@@ -7,79 +7,158 @@ from model.train import run_experiment
 
 st.set_page_config(
     page_title="APS Failure — AndesCarga S.A.",
-    page_icon="🚛",
+    page_icon="",
     layout="wide",
 )
 
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
     .stApp {
-        background-color: #ffe6f2 !important;
+        background-color: #fff0f6 !important;
+        font-family: 'Quicksand', sans-serif;
     }
     [data-testid="stSidebar"] {
-        background-color: #ffb6c1 !important;
-        border-right: 2px solid #ff1493;
+        background-color: #ffc2d4 !important;
+        border-right: 2px solid #ff85a1;
     }
     [data-testid="stSidebar"] * {
-        color: #80003a !important;
+        color: #6d0026 !important;
+        font-family: 'Quicksand', sans-serif !important;
     }
     .stButton > button {
-        background-color: #ff1493 !important;
+        background-color: #ff4d80 !important;
         color: white !important;
         border: none !important;
-        border-radius: 8px !important;
+        border-radius: 20px !important;
         font-weight: 700 !important;
+        font-family: 'Quicksand', sans-serif !important;
+        letter-spacing: 0.5px;
     }
     .stButton > button:hover {
-        background-color: #c71585 !important;
-        color: white !important;
+        background-color: #cc0044 !important;
     }
     .metric-card {
-        background: #ff69b4;
-        border-radius: 10px;
-        padding: 18px 22px;
+        background: white;
+        border-radius: 16px;
+        padding: 20px 16px;
         text-align: center;
-        border: 2px solid #ff1493;
+        border: 2px solid #ffb3c6;
+        box-shadow: 0 4px 12px rgba(255,77,128,0.1);
     }
-    .metric-value { color: white; font-size: 28px; font-weight: 700; }
-    .metric-label { color: #4d0026; font-size: 13px; margin-bottom: 4px; font-weight: 600; }
-    .metric-sub   { color: #4d0026; font-size: 11px; margin-top: 2px; }
+    .metric-label {
+        color: #cc0055;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 6px;
+    }
+    .metric-value {
+        font-size: 32px;
+        font-weight: 700;
+        margin: 4px 0;
+    }
+    .metric-sub {
+        color: #ff85a1;
+        font-size: 11px;
+        margin-top: 4px;
+    }
     .section-title {
-        font-size: 18px; font-weight: 600;
-        color: #c71585; margin: 24px 0 12px 0;
-        border-left: 4px solid #ff1493; padding-left: 10px;
+        font-size: 22px;
+        font-weight: 700;
+        color: #cc0055;
+        margin: 32px 0 16px 0;
+        text-align: center;
+        letter-spacing: 0.5px;
     }
-    h1, h2, h3, h4, p, label, span, div { color: #80003a; }
-    .stProgress > div > div { background-color: #ff1493 !important; }
+    .grafico-titulo {
+        font-size: 16px;
+        font-weight: 700;
+        color: #cc0055;
+        text-align: center;
+        margin: 24px 0 4px 0;
+    }
+    .grafico-sub {
+        font-size: 12px;
+        color: #ff85a1;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .interp-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px 24px;
+        border: 2px solid #ffb3c6;
+        margin: 8px 0;
+        box-shadow: 0 4px 12px rgba(255,77,128,0.08);
+    }
+    .interp-titulo {
+        font-size: 14px;
+        font-weight: 700;
+        color: #cc0055;
+        margin-bottom: 10px;
+    }
+    .interp-fila {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 0;
+        border-bottom: 1px solid #ffe0ec;
+        font-size: 14px;
+        color: #6d0026;
+    }
+    .interp-fila:last-child { border-bottom: none; }
+    .interp-val {
+        font-weight: 700;
+        color: #ff4d80;
+    }
+    .hipotesis-card {
+        background: #ff4d80;
+        border-radius: 16px;
+        padding: 24px;
+        color: white;
+        text-align: center;
+        margin: 16px 0;
+    }
+    .hipotesis-titulo {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .hipotesis-texto {
+        font-size: 14px;
+        opacity: 0.95;
+        line-height: 1.6;
+    }
+    h1, h2, h3 { color: #cc0055 !important; }
+    .stProgress > div > div { background-color: #ff4d80 !important; }
     [data-testid="stAlert"] {
-        background-color: #ffb6c1 !important;
-        border: 1px solid #ff1493 !important;
-        color: #80003a !important;
+        background-color: #ffe0ec !important;
+        border: 1px solid #ff85a1 !important;
+        color: #6d0026 !important;
+        border-radius: 12px !important;
     }
-    [data-testid="stExpander"] {
-        background-color: #ffd6eb !important;
-        border: 1px solid #ff69b4 !important;
-        border-radius: 8px;
-    }
-    hr { border-color: #ff69b4 !important; }
+    hr { border-color: #ffb3c6 !important; }
 </style>
 """, unsafe_allow_html=True)
 
 st.title("Mantenimiento Predictivo — Sistema APS")
-st.caption("AndesCarga S.A. · Ingeniería de Software — Inteligencia Artificial I")
+st.caption("AndesCarga S.A.  ·  Ingenieria de Software — Inteligencia Artificial I")
 st.markdown("---")
 
 with st.sidebar:
-    st.header("Configuración")
+    st.markdown("### Configuracion")
     st.markdown("**Modelo:** Random Forest")
-    st.markdown("**Árboles:** 200 | **Profundidad:** 10")
-    st.markdown("**Semilla:** 42 | **Balanceo:** SMOTE")
+    st.markdown("**Arboles:** 200 | **Profundidad:** 10")
+    st.markdown("**Semilla:** 42 | **Balanceo:** SMOTE 80/20")
     st.markdown("---")
     st.markdown("**Costos de error**")
-    st.markdown("- FN (falla no detectada): **500**")
-    st.markdown("- FP (chequeo innecesario): **10**")
+    st.markdown("FN (falla no detectada): **500**")
+    st.markdown("FP (chequeo innecesario): **10**")
     st.markdown("---")
-    run_btn = st.button("▶ Ejecutar experimento", use_container_width=True, type="primary")
+    run_btn = st.button("Ejecutar experimento", use_container_width=True, type="primary")
 
 if "results" not in st.session_state:
     st.session_state.results = None
@@ -91,7 +170,7 @@ if run_btn:
 
     def log(msg):
         steps.append(msg)
-        log_placeholder.info(f"⏳ {msg}")
+        log_placeholder.info(f"{msg}")
         progress.progress(min(len(steps) / 7, 1.0))
 
     results = run_experiment(log)
@@ -103,16 +182,15 @@ if run_btn:
 if st.session_state.results:
     r = st.session_state.results
 
-    st.markdown('<div class="section-title">Random Forest — Resultados</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Resultados del modelo</div>', unsafe_allow_html=True)
 
-    # métricas
     c1, c2, c3, c4, c5 = st.columns(5)
     cards = [
-        (c1, "Recall",      f"{r['recall']:.3f}",    "objetivo ≥ 0.85",              "white"),
-        (c2, "Precision",   f"{r['precision']:.3f}", "",                              "white"),
-        (c3, "F1-Score",    f"{r['f1']:.3f}",        "",                              "white"),
-        (c4, "Costo Total", f"{r['cost']:,}",         f"Threshold: {r['threshold']}", "white"),
-        (c5, "Threshold",   f"{r['threshold']}",      "óptimo para costo",            "white"),
+        (c1, "Recall",      f"{r['recall']:.3f}",    "objetivo >= 0.85",      "#ff4d80" if r['recall'] >= 0.85 else "#cc0055"),
+        (c2, "Precision",   f"{r['precision']:.3f}", "alertas correctas",     "#cc0055"),
+        (c3, "F1-Score",    f"{r['f1']:.3f}",        "balance P y R",         "#cc0055"),
+        (c4, "Costo Total", f"{r['cost']:,}",         "FN x500 + FP x10",     "#6d0026"),
+        (c5, "Threshold",   f"{r['threshold']}",      "umbral de decision",   "#ff4d80"),
     ]
     for col, label, val, sub, color in cards:
         with col:
@@ -124,110 +202,186 @@ if st.session_state.results:
             </div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
-    col_left, col_right = st.columns(2)
+    st.markdown("---")
 
-    with col_left:
-        st.markdown("**Matriz de Confusión**")
-        fig, ax = plt.subplots(figsize=(5, 4))
-        fig.patch.set_facecolor("#ffe6f2")
-        ax.set_facecolor("#ffe6f2")
+    # matriz de confusion
+    st.markdown('<div class="grafico-titulo">Matriz de Confusion</div>', unsafe_allow_html=True)
+    st.markdown('<div class="grafico-sub">Compara las predicciones del modelo contra los valores reales</div>', unsafe_allow_html=True)
+
+    col_cm, col_esp = st.columns([2, 1])
+    with col_cm:
+        fig, ax = plt.subplots(figsize=(6, 5))
+        fig.patch.set_facecolor("#fff0f6")
+        ax.set_facecolor("#fff0f6")
         cm = np.array([[r["tn"], r["fp"]], [r["fn"], r["tp"]]])
         sns.heatmap(
-            cm, annot=False, fmt="d", cmap="RdPu", ax=ax,
+            cm, annot=False, cmap="RdPu", ax=ax,
             xticklabels=["Pred: No falla", "Pred: Falla"],
             yticklabels=["Real: No falla", "Real: Falla"],
-            linewidths=1, linecolor="#ff1493",
+            linewidths=2, linecolor="#fff0f6",
             cbar=False, vmin=0
         )
-        # anotar manualmente con color según fondo
         for i in range(2):
             for j in range(2):
                 valor = cm[i, j]
-                total = cm.max()
-                # celdas oscuras → letra blanca, celdas claras → letra negra
-                color_texto = "white" if valor > total * 0.4 else "#80003a"
-                ax.text(j + 0.5, i + 0.5, str(valor),
+                color_texto = "white" if valor > cm.max() * 0.4 else "#6d0026"
+                ax.text(j + 0.5, i + 0.5, f"{valor:,}",
                         ha="center", va="center",
-                        color=color_texto, fontsize=14, fontweight="bold")
-        ax.tick_params(colors="#80003a")
-        ax.set_xlabel("Predicción", color="#80003a")
-        ax.set_ylabel("Valor Real", color="#80003a")
-        ax.set_title("Matriz de Confusión", color="#c71585", pad=10)
+                        color=color_texto, fontsize=16, fontweight="bold")
+        ax.tick_params(colors="#6d0026", labelsize=11)
+        ax.set_xlabel("Prediccion del modelo", color="#cc0055", fontsize=12)
+        ax.set_ylabel("Valor real", color="#cc0055", fontsize=12)
         plt.tight_layout()
         st.pyplot(fig)
         plt.close()
 
-    with col_right:
-        st.markdown("**Curva Precision-Recall**")
-        fig, ax = plt.subplots(figsize=(5, 4))
-        fig.patch.set_facecolor("#ffe6f2")
-        ax.set_facecolor("#ffd6eb")
-        ax.plot(r["pr_recall"], r["pr_precision"], color="#ff1493", linewidth=2)
-        ax.axvline(r["recall"], color="#c71585", linestyle="--", linewidth=1.2, label=f"Recall = {r['recall']:.3f}")
-        ax.axhline(r["precision"], color="#80003a", linestyle="--", linewidth=1.2, label=f"Precision = {r['precision']:.3f}")
-        ax.set_xlabel("Recall", color="#80003a")
-        ax.set_ylabel("Precision", color="#80003a")
-        ax.set_title("Curva Precision-Recall", color="#c71585")
-        ax.tick_params(colors="#80003a")
-        ax.spines["bottom"].set_color("#ff69b4")
-        ax.spines["left"].set_color("#ff69b4")
-        ax.spines["top"].set_visible(False)
-        ax.spines["right"].set_visible(False)
-        ax.legend(facecolor="#ffb6c1", labelcolor="#80003a", fontsize=9)
-        ax.grid(True, color="#ffd6eb", linewidth=0.8)
-        plt.tight_layout()
-        st.pyplot(fig)
-        plt.close()
+    with col_esp:
+        st.markdown(f"""
+        <div style="margin-top: 20px;">
+            <div class="interp-card">
+                <div class="interp-titulo">Verdaderos Negativos (TN)</div>
+                <p style="font-size:13px; color:#6d0026; margin:0;">Camiones sanos identificados correctamente.</p>
+                <p style="font-size:22px; font-weight:700; color:#ff4d80; margin:8px 0 0 0;">{r['tn']:,}</p>
+            </div>
+            <div class="interp-card" style="margin-top:8px;">
+                <div class="interp-titulo">Verdaderos Positivos (TP)</div>
+                <p style="font-size:13px; color:#6d0026; margin:0;">Fallas APS detectadas correctamente.</p>
+                <p style="font-size:22px; font-weight:700; color:#ff4d80; margin:8px 0 0 0;">{r['tp']:,}</p>
+            </div>
+            <div class="interp-card" style="margin-top:8px;">
+                <div class="interp-titulo">Falsos Positivos (FP)</div>
+                <p style="font-size:13px; color:#6d0026; margin:0;">Alarmas innecesarias — camiones sanos marcados como falla.</p>
+                <p style="font-size:22px; font-weight:700; color:#cc0055; margin:8px 0 0 0;">{r['fp']:,}</p>
+            </div>
+            <div class="interp-card" style="margin-top:8px;">
+                <div class="interp-titulo">Falsos Negativos (FN)</div>
+                <p style="font-size:13px; color:#6d0026; margin:0;">Fallas reales NO detectadas — el error mas costoso.</p>
+                <p style="font-size:22px; font-weight:700; color:#cc0055; margin:8px 0 0 0;">{r['fn']:,}</p>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("**Desglose de predicciones**")
-    fig, ax = plt.subplots(figsize=(8, 3))
-    fig.patch.set_facecolor("#ffe6f2")
-    ax.set_facecolor("#ffd6eb")
-    labels = ["TP\n(Fallas detectadas)", "TN\n(No fallas correctas)", "FP\n(Falsas alarmas)", "FN\n(Fallas perdidas)"]
-    values = [r["tp"], r["tn"], r["fp"], r["fn"]]
-    colors = ["#ff1493", "#ff69b4", "#ffb6c1", "#c71585"]
-    bars = ax.bar(labels, values, color=colors, width=0.5, edgecolor="#ffe6f2")
-    for bar, val in zip(bars, values):
-        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50,
-                str(val), ha="center", va="bottom", color="#80003a", fontsize=11, weight="bold")
-    ax.tick_params(colors="#80003a")
+    st.markdown("---")
+
+    # curva precision-recall
+    st.markdown('<div class="grafico-titulo">Curva Precision-Recall</div>', unsafe_allow_html=True)
+    st.markdown('<div class="grafico-sub">Muestra el balance entre detectar fallas y evitar falsas alarmas segun el threshold</div>', unsafe_allow_html=True)
+
+    fig, ax = plt.subplots(figsize=(10, 4))
+    fig.patch.set_facecolor("#fff0f6")
+    ax.set_facecolor("#ffe0ec")
+    ax.plot(r["pr_recall"], r["pr_precision"], color="#ff4d80", linewidth=2.5)
+    ax.axvline(r["recall"], color="#cc0055", linestyle="--", linewidth=1.5,
+               label=f"Recall = {r['recall']:.3f}")
+    ax.axhline(r["precision"], color="#6d0026", linestyle="--", linewidth=1.5,
+               label=f"Precision = {r['precision']:.3f}")
+    ax.scatter([r["recall"]], [r["precision"]], color="#ff4d80", s=120, zorder=5)
+    ax.set_xlabel("Recall (cobertura de fallas reales)", color="#6d0026", fontsize=12)
+    ax.set_ylabel("Precision (exactitud de alertas)", color="#6d0026", fontsize=12)
+    ax.tick_params(colors="#6d0026")
+    ax.spines["bottom"].set_color("#ffb3c6")
+    ax.spines["left"].set_color("#ffb3c6")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
-    ax.spines["bottom"].set_color("#ff69b4")
-    ax.spines["left"].set_color("#ff69b4")
-    ax.set_title("Distribución de predicciones", color="#c71585")
+    ax.legend(facecolor="white", labelcolor="#6d0026", fontsize=10,
+              framealpha=0.9, edgecolor="#ffb3c6")
+    ax.grid(True, color="#ffcce0", linewidth=0.6)
     plt.tight_layout()
     st.pyplot(fig)
     plt.close()
 
-    with st.expander("Interpretación de resultados"):
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.markdown(f"""
-**Detección de fallas reales:**
-- De {r['tp'] + r['fn']} fallas APS reales, el modelo detectó **{r['tp']} ({r['recall']*100:.1f}%)**
-- Solo **{r['fn']} fallas** no fueron detectadas (FN)
-- Hipótesis H₁ {'cumplida' if r['recall'] >= 0.85 else '❌ no cumplida'} (Recall {'≥' if r['recall'] >= 0.85 else '<'} 0.85)
-""")
-        with col_b:
-            st.markdown(f"""
-**Análisis de costos:**
-- FN × 500 = **{r['fn'] * 500:,}**
-- FP × 10 = **{r['fp'] * 10:,}**
-- **Costo total: {r['cost']:,}**
-- Threshold óptimo: **{r['threshold']}**
-""")
+    st.markdown("---")
 
-else:
-    st.info("Presiona **Ejecutar experimento** para iniciar")
-    st.markdown("""
-    ### ¿Qué hace este sistema?
-    Predice fallas en el **Air Pressurized System (APS)** de camiones Scania usando datos de sensores OBD-II.
+    # desglose de predicciones
+    st.markdown('<div class="grafico-titulo">Desglose de predicciones</div>', unsafe_allow_html=True)
+    st.markdown('<div class="grafico-sub">Distribucion de los 16,000 registros del conjunto de prueba</div>', unsafe_allow_html=True)
 
-    | Métrica | Objetivo |
-    |---|---|
-    | Recall | ≥ 0.85 (detectar la mayoría de fallas) |
-    | Costo total | Minimizar FN×500 + FP×10 |
+    fig, ax = plt.subplots(figsize=(10, 4))
+    fig.patch.set_facecolor("#fff0f6")
+    ax.set_facecolor("#ffe0ec")
+    labels = ["TN\nNo fallas correctas", "TP\nFallas detectadas", "FP\nFalsas alarmas", "FN\nFallas perdidas"]
+    values = [r["tn"], r["tp"], r["fp"], r["fn"]]
+    colores = ["#ffb3c6", "#ff4d80", "#ff85a1", "#cc0055"]
+    bars = ax.bar(labels, values, color=colores, width=0.5, edgecolor="white", linewidth=1.5)
+    for bar, val in zip(bars, values):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + max(values) * 0.01,
+                f"{val:,}", ha="center", va="bottom", color="#6d0026",
+                fontsize=12, fontweight="bold")
+    ax.tick_params(colors="#6d0026", labelsize=11)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["bottom"].set_color("#ffb3c6")
+    ax.spines["left"].set_color("#ffb3c6")
+    ax.set_ylim(0, max(values) * 1.15)
+    plt.tight_layout()
+    st.pyplot(fig)
+    plt.close()
 
-    **Modelo:** Random Forest · 200 árboles · profundidad 10 · SMOTE · threshold optimizado
-    """)
+    st.markdown("---")
+
+    # interpretacion
+    st.markdown('<div class="section-title">Interpretacion de resultados</div>', unsafe_allow_html=True)
+
+    col_a, col_b = st.columns(2)
+    with col_a:
+        st.markdown(f"""
+        <div class="interp-card">
+            <div class="interp-titulo">Deteccion de fallas</div>
+            <div class="interp-fila">
+                <span>Fallas APS reales en el test set</span>
+                <span class="interp-val">{r['tp'] + r['fn']}</span>
+            </div>
+            <div class="interp-fila">
+                <span>Fallas detectadas correctamente (TP)</span>
+                <span class="interp-val">{r['tp']}</span>
+            </div>
+            <div class="interp-fila">
+                <span>Fallas NO detectadas (FN)</span>
+                <span class="interp-val">{r['fn']}</span>
+            </div>
+            <div class="interp-fila">
+                <span>Tasa de deteccion (Recall)</span>
+                <span class="interp-val">{r['recall']*100:.1f}%</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_b:
+        st.markdown(f"""
+        <div class="interp-card">
+            <div class="interp-titulo">Analisis de costos</div>
+            <div class="interp-fila">
+                <span>Costo por falla no detectada (FN x 500)</span>
+                <span class="interp-val">{r['fn'] * 500:,}</span>
+            </div>
+            <div class="interp-fila">
+                <span>Costo por alarma innecesaria (FP x 10)</span>
+                <span class="interp-val">{r['fp'] * 10:,}</span>
+            </div>
+            <div class="interp-fila">
+                <span>Costo total del modelo</span>
+                <span class="interp-val">{r['cost']:,}</span>
+            </div>
+            <div class="interp-fila">
+                <span>Umbral de decision usado</span>
+                <span class="interp-val">{r['threshold']}</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    estado_h1 = r['recall'] >= 0.85
+    st.markdown(f"""
+    <div class="hipotesis-card">
+        <div class="hipotesis-titulo">
+            {'Hipotesis H1 CUMPLIDA' if estado_h1 else 'Hipotesis H1 NO cumplida'}
+        </div>
+        <div class="hipotesis-texto">
+            El modelo {'detecto' if estado_h1 else 'no detecto'} la mayoria de fallas APS reales
+            con Recall = {r['recall']:.3f} {'mayor o igual' if estado_h1 else 'menor'} a 0.85.<br>
+            {'H0 se rechaza: el modelo predictivo mejora significativamente la deteccion frente al enfoque reactivo actual.' if estado_h1 else 'H0 no se puede rechazar con los resultados actuales.'}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
