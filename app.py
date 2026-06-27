@@ -7,7 +7,6 @@ import pandas as pd
 from model.train import (
     load_and_preprocess,
     train_random_forest,
-    train_decision_tree,
     evaluate_model,
 )
 
@@ -43,11 +42,7 @@ st.markdown("---")
 
 with st.sidebar:
     st.header("⚙️ Configuración")
-    modelo_elegido = st.radio(
-        "Modelo",
-        ["Random Forest", "Árbol de Decisión", "Comparar ambos"],
-        index=0,
-    )
+    st.markdown("**Modelo:** Random Forest")
     usar_threshold_optimo = st.checkbox("Optimizar threshold automáticamente", value=True)
     if not usar_threshold_optimo:
         threshold_manual = st.slider("Threshold manual", 0.10, 0.90, 0.50, 0.01)
@@ -74,18 +69,10 @@ if run_btn:
 
     X_train, y_train, X_test, y_test = load_and_preprocess(log)
 
-    results = {}
-
-    if modelo_elegido in ["Random Forest", "Comparar ambos"]:
-        rf = train_random_forest(X_train, y_train, log)
-        thr = None if usar_threshold_optimo else threshold_manual
-        results["Random Forest"] = evaluate_model(rf, X_test, y_test, thr)
-
-    if modelo_elegido in ["Árbol de Decisión", "Comparar ambos"]:
-        dt = train_decision_tree(X_train, y_train, log)
-        thr = None if usar_threshold_optimo else threshold_manual
-        results["Árbol de Decisión"] = evaluate_model(dt, X_test, y_test, thr)
-
+    # por esto
+    thr = None if usar_threshold_optimo else threshold_manual
+    rf = train_random_forest(X_train, y_train, log)
+    results = {"Random Forest": evaluate_model(rf, X_test, y_test, thr)}
     st.session_state.results = results
     log_placeholder.empty()
     progress.empty()
@@ -200,19 +187,6 @@ def render_results(name, r):
 
 if st.session_state.results:
     results = st.session_state.results
-
-    if len(results) == 2:
-        st.markdown('<div class="section-title">Comparación de modelos</div>', unsafe_allow_html=True)
-        comp_data = {
-            "Modelo": list(results.keys()),
-            "Recall": [r["recall"] for r in results.values()],
-            "Precision": [r["precision"] for r in results.values()],
-            "F1-Score": [r["f1"] for r in results.values()],
-            "Costo Total": [r["cost"] for r in results.values()],
-            "Threshold": [r["threshold"] for r in results.values()],
-        }
-        st.dataframe(pd.DataFrame(comp_data).set_index("Modelo"), use_container_width=True)
-        st.markdown("---")
 
     for name, r in results.items():
         render_results(name, r)

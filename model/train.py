@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import (
     confusion_matrix, recall_score, precision_score,
     f1_score, precision_recall_curve
@@ -67,12 +66,6 @@ def train_random_forest(X_train, y_train, progress_callback=None):
     return rf
 
 
-def train_decision_tree(X_train, y_train, progress_callback=None):
-    if progress_callback:
-        progress_callback("Entrenando Árbol de Decisión...")
-    dt = DecisionTreeClassifier(max_depth=10, random_state=42)
-    dt.fit(X_train, y_train)
-    return dt
 
 
 def find_best_threshold(model, X_test, y_test):
