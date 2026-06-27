@@ -5,8 +5,8 @@ from sklearn.metrics import confusion_matrix, recall_score, precision_score, f1_
 from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier
 
-TRAIN_URL = 'https://raw.githubusercontent.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/refs/heads/master/Data/aps_failure_training_set_SMALLER.csv'
-TEST_URL  = 'https://raw.githubusercontent.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/refs/heads/master/Data/aps_failure_test_set.csv'
+TRAIN_URL = "data/aps_failure_training_set.csv"
+TEST_URL  = "data/aps_failure_test_set.csv"
 
 COST_FN = 500
 COST_FP = 10
@@ -56,14 +56,15 @@ def run_experiment(progress_callback=None):
 
     # 3.5 Balanceo con SMOTE
     log("Aplicando SMOTE...")
-    smote = SMOTE(random_state=42)
+    smote = SMOTE(random_state=42, sampling_strategy=0.25)
     X_train_bal, y_train_bal = smote.fit_resample(X_train_scaled, y_train)
 
     # 4. Entrenamiento Random Forest
     log("Entrenando Random Forest...")
-    # por esto
-    # por esto
-    rf = RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42, min_samples_leaf=5, min_samples_split=10)
+    rf = RandomForestClassifier(
+        n_estimators=200, max_depth=10,
+        random_state=42
+    )
     rf.fit(X_train_bal, y_train_bal)
 
     # 5. Predicción con threshold por defecto (0.5)
@@ -83,7 +84,7 @@ def run_experiment(progress_callback=None):
     # 6. Ajuste de threshold para minimizar costo
     log("Optimizando threshold...")
     # 6. Threshold fijo en 0.18 según experimento original
-    best_threshold = 0.18
+    best_threshold = 0.35
     y_pred_opt = (y_prob >= best_threshold).astype(int)
     tn2, fp2, fn2, tp2 = confusion_matrix(y_test, y_pred_opt).ravel()
     min_cost = fn2 * COST_FN + fp2 * COST_FP
