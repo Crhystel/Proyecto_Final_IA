@@ -2,13 +2,8 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-import pandas as pd
 
-from model.train import (
-    load_and_preprocess,
-    train_random_forest,
-    evaluate_model,
-)
+from model.train import run_experiment
 
 st.set_page_config(
     page_title="APS Failure — AndesCarga S.A.",
@@ -54,16 +49,8 @@ st.markdown("""
         color: #c71585; margin: 24px 0 12px 0;
         border-left: 4px solid #ff1493; padding-left: 10px;
     }
-    h1, h2, h3, h4, p, label, span, div {
-        color: #80003a;
-    }
-    [data-testid="stDataFrame"] {
-        border: 2px solid #ff1493 !important;
-        border-radius: 8px;
-    }
-    .stProgress > div > div {
-        background-color: #ff1493 !important;
-    }
+    h1, h2, h3, h4, p, label, span, div { color: #80003a; }
+    .stProgress > div > div { background-color: #ff1493 !important; }
     [data-testid="stAlert"] {
         background-color: #ffb6c1 !important;
         border: 1px solid #ff1493 !important;
@@ -74,13 +61,7 @@ st.markdown("""
         border: 1px solid #ff69b4 !important;
         border-radius: 8px;
     }
-    hr {
-        border-color: #ff69b4 !important;
-    }
-    .stCheckbox label, .stRadio label {
-        color: #80003a !important;
-        font-weight: 500;
-    }
+    hr { border-color: #ff69b4 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -89,18 +70,16 @@ st.caption("AndesCarga S.A. · Ingeniería de Software — Inteligencia Artifici
 st.markdown("---")
 
 with st.sidebar:
-    st.header("⚙️ Configuración")
+    st.header("Configuración")
     st.markdown("**Modelo:** Random Forest")
-    usar_threshold_optimo = st.checkbox("Optimizar threshold automáticamente", value=True)
-    if not usar_threshold_optimo:
-        threshold_manual = st.slider("Threshold manual", 0.10, 0.90, 0.50, 0.01)
-
+    st.markdown("**Árboles:** 200 | **Profundidad:** 10")
+    st.markdown("**Semilla:** 42 | **Balanceo:** SMOTE")
     st.markdown("---")
     st.markdown("**Costos de error**")
     st.markdown("- FN (falla no detectada): **500**")
     st.markdown("- FP (chequeo innecesario): **10**")
     st.markdown("---")
-    run_btn = st.button("▶ Ejecutar modelo", use_container_width=True, type="primary")
+    run_btn = st.button("▶ Ejecutar experimento", use_container_width=True, type="primary")
 
 if "results" not in st.session_state:
     st.session_state.results = None
@@ -113,21 +92,20 @@ if run_btn:
     def log(msg):
         steps.append(msg)
         log_placeholder.info(f"⏳ {msg}")
-        progress.progress(min(len(steps) / 8, 1.0))
+        progress.progress(min(len(steps) / 7, 1.0))
 
-    X_train, y_train, X_test, y_test = load_and_preprocess(log)
-    thr = None if usar_threshold_optimo else threshold_manual
-    rf = train_random_forest(X_train, y_train, log)
-    results = {"Random Forest": evaluate_model(rf, X_test, y_test, thr)}
+    results = run_experiment(log)
     st.session_state.results = results
     log_placeholder.empty()
     progress.empty()
-    st.success("Modelo ejecutado correctamente")
+    st.success("Experimento completado")
 
+if st.session_state.results:
+    r = st.session_state.results
 
-def render_results(name, r):
-    st.markdown(f'<div class="section-title">{name}</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Random Forest — Resultados</div>', unsafe_allow_html=True)
 
+    # métricas
     c1, c2, c3, c4, c5 = st.columns(5)
     cards = [
         (c1, "Recall",      f"{r['recall']:.3f}",    "objetivo ≥ 0.85",              "#ff1493" if r['recall'] >= 0.85 else "#c71585"),
@@ -155,7 +133,7 @@ def render_results(name, r):
         ax.set_facecolor("#ffe6f2")
         cm = np.array([[r["tn"], r["fp"]], [r["fn"], r["tp"]]])
         sns.heatmap(
-            cm, annot=True, fmt="d", cmap="PiYG", ax=ax,
+            cm, annot=True, fmt="d", cmap="RdPu", ax=ax,
             xticklabels=["Pred: No falla", "Pred: Falla"],
             yticklabels=["Real: No falla", "Real: Falla"],
             linewidths=0.5, linecolor="#ffb6c1",
@@ -202,7 +180,7 @@ def render_results(name, r):
     bars = ax.bar(labels, values, color=colors, width=0.5, edgecolor="#ffe6f2")
     for bar, val in zip(bars, values):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 50,
-                str(val), ha="center", va="bottom", color="#80003a", fontsize=11)
+                str(val), ha="center", va="bottom", color="#80003a", fontsize=11, weight="bold")
     ax.tick_params(colors="#80003a")
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
@@ -213,7 +191,7 @@ def render_results(name, r):
     st.pyplot(fig)
     plt.close()
 
-    with st.expander("📋 Interpretación de resultados"):
+    with st.expander("Interpretación de resultados"):
         col_a, col_b = st.columns(2)
         with col_a:
             st.markdown(f"""
@@ -228,16 +206,11 @@ def render_results(name, r):
 - FN × 500 = **{r['fn'] * 500:,}**
 - FP × 10 = **{r['fp'] * 10:,}**
 - **Costo total: {r['cost']:,}**
-- Threshold usado: **{r['threshold']}**
+- Threshold óptimo: **{r['threshold']}**
 """)
 
-
-if st.session_state.results:
-    for name, r in st.session_state.results.items():
-        render_results(name, r)
-        st.markdown("---")
 else:
-    st.info(" Configura el modelo en el panel izquierdo y presiona **Ejecutar modelo**")
+    st.info("Presiona **Ejecutar experimento** para iniciar")
     st.markdown("""
     ### ¿Qué hace este sistema?
     Predice fallas en el **Air Pressurized System (APS)** de camiones Scania usando datos de sensores OBD-II.
@@ -247,5 +220,5 @@ else:
     | Recall | ≥ 0.85 (detectar la mayoría de fallas) |
     | Costo total | Minimizar FN×500 + FP×10 |
 
-    **Modelo:** Random Forest (200 árboles, profundidad máxima 10, threshold optimizado)
+    **Modelo:** Random Forest · 200 árboles · profundidad 10 · SMOTE · threshold optimizado
     """)
