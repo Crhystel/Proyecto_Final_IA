@@ -8,9 +8,9 @@ from sklearn.metrics import (
 )
 from imblearn.over_sampling import SMOTE
 
-TRAIN_URL = "https://github.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/raw/refs/heads/master/Data/aps_failure_training_set_SMALLER.csv"
+TRAIN_URL = "https://raw.githubusercontent.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/refs/heads/master/Data/aps_failure_training_set_SMALLER.csv"
 
-TEST_URL = "https://github.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/raw/refs/heads/master/Data/aps_failure_test_set.csv"
+TEST_URL = "https://raw.githubusercontent.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/refs/heads/master/Data/aps_failure_test_set.csv"
 
 COST_FN = 500
 COST_FP = 10
@@ -23,40 +23,38 @@ def load_and_preprocess(progress_callback=None):
 
     log("Cargando datasets...")
     train_df = pd.read_csv(TRAIN_URL)
-    test_df = pd.read_csv(TEST_URL)
+    test_df  = pd.read_csv(TEST_URL)
 
     log("Preprocesando datos...")
-    for df in [train_df, test_df]:
-        df.replace(["na", "na0"], np.nan, inplace=True)
-        df["class"] = df["class"].map({"pos": 1, "neg": 0})
+    train_df['class'] = train_df['class'].map({'pos': 1, 'neg': 0})
+    test_df['class']  = test_df['class'].map({'pos': 1, 'neg': 0})
 
-    train_df = train_df.apply(pd.to_numeric, errors="coerce")
-    test_df = test_df.apply(pd.to_numeric, errors="coerce")
+    # eliminar columnas con >75% missing
+    missing_thresh = 0.75
+    cols_to_drop = train_df.columns[train_df.isna().mean() > missing_thresh]
+    train_df.drop(columns=cols_to_drop, inplace=True)
+    test_df.drop(columns=cols_to_drop, inplace=True)
 
-    thresh = len(train_df) * 0.25
-    train_df = train_df.dropna(axis=1, thresh=int(thresh))
-    test_df = test_df[train_df.columns]
-
+    # imputar con media de entrenamiento
     train_means = train_df.mean()
     train_df.fillna(train_means, inplace=True)
     test_df.fillna(train_means, inplace=True)
 
-    X_train = train_df.drop("class", axis=1)
-    y_train = train_df["class"]
-    X_test = test_df.drop("class", axis=1)
-    y_test = test_df["class"]
+    X_train = train_df.drop('class', axis=1)
+    y_train = train_df['class']
+    X_test  = test_df.drop('class', axis=1)
+    y_test  = test_df['class']
 
     log("Estandarizando...")
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    X_test_scaled  = scaler.transform(X_test)
 
     log("Aplicando SMOTE...")
     smote = SMOTE(random_state=42)
     X_train_bal, y_train_bal = smote.fit_resample(X_train_scaled, y_train)
 
     return X_train_bal, y_train_bal, X_test_scaled, y_test
-
 
 def train_random_forest(X_train, y_train, progress_callback=None):
     if progress_callback:

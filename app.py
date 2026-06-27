@@ -155,11 +155,12 @@ def render_results(name, r):
         ax.set_facecolor("#ffe6f2")
         cm = np.array([[r["tn"], r["fp"]], [r["fn"], r["tp"]]])
         sns.heatmap(
-            cm, annot=True, fmt="d", cmap="RdPu", ax=ax,
+            cm, annot=True, fmt="d", cmap="PiYG", ax=ax,
             xticklabels=["Pred: No falla", "Pred: Falla"],
             yticklabels=["Real: No falla", "Real: Falla"],
             linewidths=0.5, linecolor="#ffb6c1",
-            annot_kws={"color": "white", "size": 13}
+            annot_kws={"color": "white", "size": 13, "weight": "bold"},
+            cbar=False
         )
         ax.tick_params(colors="#80003a")
         ax.set_xlabel("Predicción", color="#80003a")
