@@ -41,8 +41,8 @@ st.markdown("""
         text-align: center;
         border: 2px solid #ff1493;
     }
-    .metric-label { color: #80003a; font-size: 13px; margin-bottom: 4px; font-weight: 600; }
-    .metric-value { color: #ffffff; font-size: 28px; font-weight: 700; }
+    .metric-value { color: white; font-size: 28px; font-weight: 700; }
+    .metric-label { color: #4d0026; font-size: 13px; margin-bottom: 4px; font-weight: 600; }
     .metric-sub   { color: #4d0026; font-size: 11px; margin-top: 2px; }
     .section-title {
         font-size: 18px; font-weight: 600;
@@ -108,11 +108,11 @@ if st.session_state.results:
     # métricas
     c1, c2, c3, c4, c5 = st.columns(5)
     cards = [
-        (c1, "Recall",      f"{r['recall']:.3f}",    "objetivo ≥ 0.85",              "#ff1493" if r['recall'] >= 0.85 else "#c71585"),
-        (c2, "Precision",   f"{r['precision']:.3f}", "",                              "#c71585"),
-        (c3, "F1-Score",    f"{r['f1']:.3f}",        "",                              "#c71585"),
-        (c4, "Costo Total", f"{r['cost']:,}",         f"Threshold: {r['threshold']}", "#80003a"),
-        (c5, "Threshold",   f"{r['threshold']}",      "óptimo para costo",            "#ff1493"),
+        (c1, "Recall",      f"{r['recall']:.3f}",    "objetivo ≥ 0.85",              "white"),
+        (c2, "Precision",   f"{r['precision']:.3f}", "",                              "white"),
+        (c3, "F1-Score",    f"{r['f1']:.3f}",        "",                              "white"),
+        (c4, "Costo Total", f"{r['cost']:,}",         f"Threshold: {r['threshold']}", "white"),
+        (c5, "Threshold",   f"{r['threshold']}",      "óptimo para costo",            "white"),
     ]
     for col, label, val, sub, color in cards:
         with col:
@@ -133,13 +133,22 @@ if st.session_state.results:
         ax.set_facecolor("#ffe6f2")
         cm = np.array([[r["tn"], r["fp"]], [r["fn"], r["tp"]]])
         sns.heatmap(
-            cm, annot=True, fmt="d", cmap="RdPu", ax=ax,
+            cm, annot=False, fmt="d", cmap="RdPu", ax=ax,
             xticklabels=["Pred: No falla", "Pred: Falla"],
             yticklabels=["Real: No falla", "Real: Falla"],
-            linewidths=0.5, linecolor="#ffb6c1",
-            annot_kws={"color": "white", "size": 13, "weight": "bold"},
-            cbar=False
+            linewidths=1, linecolor="#ff1493",
+            cbar=False, vmin=0
         )
+        # anotar manualmente con color según fondo
+        for i in range(2):
+            for j in range(2):
+                valor = cm[i, j]
+                total = cm.max()
+                # celdas oscuras → letra blanca, celdas claras → letra negra
+                color_texto = "white" if valor > total * 0.4 else "#80003a"
+                ax.text(j + 0.5, i + 0.5, str(valor),
+                        ha="center", va="center",
+                        color=color_texto, fontsize=14, fontweight="bold")
         ax.tick_params(colors="#80003a")
         ax.set_xlabel("Predicción", color="#80003a")
         ax.set_ylabel("Valor Real", color="#80003a")

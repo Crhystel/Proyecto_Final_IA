@@ -61,7 +61,9 @@ def run_experiment(progress_callback=None):
 
     # 4. Entrenamiento Random Forest
     log("Entrenando Random Forest...")
-    rf = RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42)
+    # por esto
+    # por esto
+    rf = RandomForestClassifier(n_estimators=200, max_depth=10, random_state=42, min_samples_leaf=5, min_samples_split=10)
     rf.fit(X_train_bal, y_train_bal)
 
     # 5. Predicción con threshold por defecto (0.5)
@@ -80,16 +82,11 @@ def run_experiment(progress_callback=None):
 
     # 6. Ajuste de threshold para minimizar costo
     log("Optimizando threshold...")
-    best_threshold = 0.5
-    min_cost = cost_total
-
-    for thr in np.arange(0.1, 0.9, 0.01):
-        y_thr = (y_prob >= thr).astype(int)
-        tn2, fp2, fn2, tp2 = confusion_matrix(y_test, y_thr).ravel()
-        cost = fn2 * COST_FN + fp2 * COST_FP
-        if cost < min_cost:
-            min_cost = cost
-            best_threshold = round(thr, 2)
+    # 6. Threshold fijo en 0.18 según experimento original
+    best_threshold = 0.18
+    y_pred_opt = (y_prob >= best_threshold).astype(int)
+    tn2, fp2, fn2, tp2 = confusion_matrix(y_test, y_pred_opt).ravel()
+    min_cost = fn2 * COST_FN + fp2 * COST_FP
 
     # Recalcular métricas con el threshold óptimo
     y_pred_opt = (y_prob >= best_threshold).astype(int)
