@@ -9,16 +9,9 @@ from sklearn.metrics import (
 )
 from imblearn.over_sampling import SMOTE
 
-TRAIN_URL = (
-    "https://raw.githubusercontent.com/chaitra31595/Machine-Learning---"
-    "APS-Failure-at-Scania-Trucks-Data-Set/refs/heads/master/Data/"
-    "aps_failure_training_set_SMALLER.csv"
-)
-TEST_URL = (
-    "https://raw.githubusercontent.com/chaitra31595/Machine-Learning---"
-    "APS-Failure-at-Scania-Trucks-Data-Set/refs/heads/master/Data/"
-    "aps_failure_test_set.csv"
-)
+TRAIN_URL = "https://github.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/raw/refs/heads/master/Data/aps_failure_training_set_SMALLER.csv"
+
+TEST_URL = "https://github.com/chaitra31595/Machine-Learning---APS-Failure-at-Scania-Trucks-Data-Set/raw/refs/heads/master/Data/aps_failure_test_set.csv"
 
 COST_FN = 500
 COST_FP = 10
